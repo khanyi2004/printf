@@ -1,25 +1,50 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdarg.h>
 #include "main.h"
 
-/**
- * _printf - function my printf
- * @format: string with format to print
- *
- * Return: number of chars that print
- */
+int _printf(const char *format, ...) {
+    va_list args;
+    va_start(args, format);
 
-int _printf(const char *format, ...)
-{
-	va_list args;
-	int length_of_string = 0;
+    int count = 0; // Number of characters printed
 
-	if (format == NULL)
-		return (-1);
+    while (*format) {
+        if (*format == '%') {
+            format++; // Move past '%'
+            switch (*format) {
+                case 'c': {
+                    char c = (char)va_arg(args, int);
+                    putchar(c);
+                    count++;
+                    break;
+                }
+                case 's': {
+                    char *str = va_arg(args, char *);
+                    while (*str) {
+                        putchar(*str);
+                        str++;
+                        count++;
+                    }
+                    break;
+                }
+                case '%': {
+                    putchar('%');
+                    count++;
+                    break;
+                }
+            }
+        } else {
+            putchar(*format);
+            count++;
+        }
+        format++;
+    }
 
-	va_start(args, format);
+    va_end(args);
+    return count;
+}
 
-	length_of_string = _print_format(format, args);
-	va_end(args);
-	return (length_of_string);
+int main() {
+    _printf("Hello, %s! This is a %c test. Percent sign: %%\n", "world", 'C');
+    return 0;
 }
